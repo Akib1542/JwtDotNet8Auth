@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityManagerServerApi.Controllers
@@ -18,8 +19,22 @@ namespace IdentityManagerServerApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpGet("admin")]
+        [Authorize(Roles = "Admin")]
+        public IEnumerable<WeatherForecast> GetForestByAdmin()
+        {
+            return Enumerable.Range(1, 10).Select(index => new WeatherForecast
+            {
+                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+            })
+            .ToArray();
+        }
+
+        [HttpGet("user")]
+        [Authorize(Roles = "User")]
+        public IEnumerable<WeatherForecast> GetForestByUser()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
@@ -29,5 +44,6 @@ namespace IdentityManagerServerApi.Controllers
             })
             .ToArray();
         }
+
     }
 }
